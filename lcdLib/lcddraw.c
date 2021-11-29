@@ -17,6 +17,27 @@ void drawPixel(u_char col, u_char row, u_int colorBGR)
   lcd_writeColor(colorBGR);
 }
 
+//Draw diamond function
+void drawDiamond(char center, u_int shapeColor)
+{
+  for (u_char r = 0; r < 11; r++0)
+    {
+      for (u_char c = 0; c <= r; c++)
+	{
+	  drawPixel(center+c, r, shapeColor);
+	  drawPixel(center-c, r, shapeColor);
+	}
+    }
+  for (u_char c = 0; c < 11; c++0)
+    {
+      for (u_char r = 0; r <= 20; r++)
+	{
+	  drawPixel(center+c, r, shapeColor);
+	  drawPixel(center-c, r, shapeColor);
+	}
+    }
+}
+
 /** Fill rectangle
  *
  *  \param colMin Column start
@@ -72,6 +93,29 @@ void drawChar5x7(u_char rcol, u_char rrow, char c,
   }
 }
 
+// New Fnt  - this function draws background pixels but with a different font
+void draw_char8x12(u_char rcol, u_char rrow, char c, u_int fgColorBGR, u_int bgColorBGR)
+{
+  u_char col = 0;
+  u_char row = 0;
+  u_char bit = 0x01;
+  u_char oc = c - 0x20;
+
+  lcd_setArea(rcol, rcol + 8, rrow + 12);
+  while (row < 12){
+    u_int rowBits = font_8x12[oc][row];
+    bit = 0x01;
+    while (col < 8){
+      u_int colorBGR = (rowBits & bit) ? fgColorBGR : bgColorBGR;
+      lcd_writeColor(colorBGR);
+      col++;
+      bit <<= 1;
+    }
+    col = 0;
+    row++;
+  }
+}
+
 /** Draw string at col,row
  *  Type:
  *  FONT_SM - small (5x8,) FONT_MD - medium (8x12,) FONT_LG - large (11x16)
@@ -94,7 +138,17 @@ void drawString5x7(u_char col, u_char row, char *string,
   }
 }
 
-
+		  
+void drawString8x12(u_char col, u_char row, char *string,
+		    u_int fgColorBGR, u_int bgColorBGR)
+		  {
+		    u_char cols = col;
+		    while (*string) {
+		      drawChar8x12(cols, row, *string++, fgColorBGR, bgColorBGR);
+		      color += 9;
+		    }
+		  }
+		  
 /** Draw rectangle outline
  *  
  *  \param colMin Column start
